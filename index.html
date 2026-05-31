@@ -3,28 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة اختبار الإملاء العربي</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>المُتَمَيِّز في الإملاء - لعبة تدريب على الإملاء العربي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.8);
-            --bg-gradient: linear-gradient(135deg, #0f172a, #1e293b, #4f46e5);
-            --correct-color: #4ade80;
-            --incorrect-color: #f87171;
-            --progress-color: #8b5cf6;
-        }
-
-        [data-theme="dark"] {
-            --glass-bg: rgba(15, 23, 42, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --bg-gradient: linear-gradient(135deg, #0f172a, #1e293b, #1e40af);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -32,269 +13,201 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-primary);
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #b3e5fc);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 2rem;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        .background-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-            background-image: url('https://image.qwenlm.ai/public_source/4eefde60-8723-4d73-bb8d-94690afe6530/1f3667b3c-92ae-491b-88b6-efcdde85aacf.png');
-            background-size: cover;
-            background-position: center;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+            padding: 20px;
+            color: #333;
         }
 
         .container {
-            max-width: 800px;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         header {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 30px;
         }
 
         h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        .quiz-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .question-container {
-            margin-bottom: 1.5rem;
-        }
-
-        .question-text {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        .options-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .option-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1rem;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .option-btn:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .option-btn:disabled {
-            cursor: not-allowed;
-        }
-
-        .option-btn.correct {
-            background: var(--correct-color);
-            color: white;
-            animation: pulse 0.5s ease;
-        }
-
-        .option-btn.incorrect {
-            background: var(--incorrect-color);
-            color: white;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .explanation {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .explanation.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .next-btn {
-            background: var(--progress-color);
-        }
-
-        .export-controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .ratio-selector {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 0.5rem;
-            color: var(--text-primary);
-            backdrop-filter: blur(10px);
+            font-size: 2.5rem;
+            color: #0288d1;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .progress-container {
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-bar {
+            background: rgba(255, 255, 255, 0.5);
             height: 10px;
-            background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
+            margin: 20px 0;
             overflow: hidden;
         }
 
-        .progress-fill {
+        .progress-bar {
             height: 100%;
-            background: var(--progress-color);
+            background: linear-gradient(to right, #0288d1, #00bcd4);
             width: 0%;
             transition: width 0.4s ease;
         }
 
-        .score-display {
+        .question-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: 500;
+            color: #0288d1;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 20px 0;
+            color: #01579b;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .option-btn {
+            padding: 20px;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(2, 136, 209, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .option-btn.correct {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option-btn.correct .icon,
+        .option-btn.incorrect .icon {
+            opacity: 1;
+        }
+
+        .result-message {
             text-align: center;
             font-size: 1.2rem;
-            margin-top: 0.5rem;
+            margin: 20px 0;
+            min-height: 30px;
+            color: #01579b;
+            font-weight: 500;
+        }
+
+        .score-container {
+            text-align: center;
+            font-size: 1.3rem;
+            margin: 20px 0;
+            color: #0288d1;
+            font-weight: 700;
+        }
+
+        .restart-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #0288d1, #00bcd4);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(2, 136, 209, 0.3);
         }
 
         footer {
-            margin-top: auto;
-            padding: 1.5rem;
-            text-align: center;
-            color: var(--text-secondary);
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(2, 136, 209, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .copyright {
+            color: #0288d1;
+            font-weight: 500;
         }
 
         .social-links {
             display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1rem;
+            gap: 15px;
         }
 
         .social-icon {
             width: 40px;
             height: 40px;
-            fill: var(--text-primary);
+            border-radius: 50%;
+            background: rgba(2, 136, 209, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s ease;
         }
 
         .social-icon:hover {
-            fill: #8b5cf6;
+            background: rgba(2, 136, 209, 0.2);
             transform: scale(1.1);
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5rem;
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
             }
             
-            .quiz-card {
-                padding: 1.5rem;
+            h1 {
+                font-size: 1.8rem;
             }
             
             .question-text {
@@ -302,642 +215,233 @@
             }
             
             .option-btn {
-                padding: 0.8rem;
-                font-size: 1rem;
+                padding: 15px;
+                font-size: 1.1rem;
+            }
+            
+            footer {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="background-animation"></div>
-    
-    <button class="theme-toggle" id="themeToggle">🌙</button>
-    
     <div class="container">
         <header>
-            <h1>منصة اختبار الإملاء العربي</h1>
-            <p>اختبر مهاراتك في الإملاء العربي</p>
+            <h1> spotting the correct spelling </h1>
+            <p>اختبر مهاراتك الإملائية باللغة العربية</p>
         </header>
-        
+
+        <div class="question-info">
+            <span id="question-counter">السؤال 1 من 50</span>
+            <span id="score">النتيجة: 0</span>
+        </div>
+
         <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="score-display" id="scoreDisplay">النتيجة: 0/500</div>
+            <div class="progress-bar" id="progress-bar"></div>
         </div>
-        
-        <div class="quiz-card" id="quizCard">
-            <div class="question-container">
-                <div class="question-text" id="questionText">جاري تحميل السؤال...</div>
-            </div>
-            
-            <div class="options-container" id="optionsContainer">
-                <!-- Options will be inserted here by JavaScript -->
-            </div>
-            
-            <div class="explanation" id="explanation">
-                <strong>القاعدة:</strong> <span id="ruleText"></span>
-            </div>
-            
-            <div class="controls">
-                <button class="btn next-btn" id="nextBtn" disabled>السؤال التالي</button>
-            </div>
-            
-            <div class="export-controls">
-                <select class="ratio-selector" id="ratioSelector">
-                    <option value="9x16">Story (9:16)</option>
-                    <option value="1x1" selected>Post (1:1)</option>
-                    <option value="4x5">Custom (4:5)</option>
-                </select>
-                <button class="btn" id="exportBtn">تصدير الصورة</button>
-            </div>
+
+        <div class="question-text" id="question-text">اختر الكلمة المكتوبة بشكل صحيح:</div>
+
+        <div class="options-container" id="options-container">
+            <!-- Options will be inserted here by JavaScript -->
         </div>
+
+        <div class="result-message" id="result-message"></div>
+
+        <div class="score-container">
+            <div id="current-score">النتيجة الحالية: 0 / 0</div>
+        </div>
+
+        <button class="restart-btn" id="restart-btn">إعادة اللعبة</button>
+
+        <footer>
+            <div class="copyright">جميع الحقوق محفوظة © 2026</div>
+            <div class="social-links">
+                <a href="https://instagram.com/ne_7u" target="_blank" class="social-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#0288d1">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                <a href="https://t.me/wwgtr" target="_blank" class="social-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#0288d1">
+                        <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.141-.259.259-.374.261l.213-3.053 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.136-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+                    </svg>
+                </a>
+            </div>
+        </footer>
     </div>
-    
-    <footer>
-        <p>Developed with ❤️</p>
-        <div class="social-links">
-            <a href="https://instagram.com/ne_7u" target="_blank">
-                <svg class="social-icon" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-            </a>
-            <a href="https://t.me/WWGTR" target="_blank">
-                <svg class="social-icon" viewBox="0 0 24 24">
-                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.354-1.297-.778.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                </svg>
-            </a>
-        </div>
-    </footer>
 
     <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        
-        // Check for saved theme preference or default to light
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.setAttribute('data-theme', 'dark');
-            themeToggle.textContent = '☀️';
-        }
-        
-        themeToggle.addEventListener('click', () => {
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                themeToggle.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-        
-        // Quiz questions data
+        // Array of 50 spelling questions
         const questions = [
-            {
-                question: "أي من الكلمتين التالية صحيحة إملائيًا؟",
-                option1: "القَصيدة",
-                option2: "القُصيدة",
-                correctIndex: 0,
-                rule: "تُكتب الهمزة على الألف إذا كانت في أول الكلمة وسُكِّن ما قبلها."
-            },
-            {
-                question: "ما هو الشكل الصحيح للكلمة التالية؟",
-                option1: "الرجل",
-                option2: "الرُجل",
-                correctIndex: 0,
-                rule: "لا تُكتب همزة القطع بعد حرف المد في بداية الكلمة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "المُسلِم",
-                option2: "المُسْلِم",
-                correctIndex: 0,
-                rule: "لا تُكتب همزة الوصل في وسط الكلمة."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "يَفهَم",
-                option2: "يَفهُم",
-                correctIndex: 0,
-                rule: "تُكتب الهمزة في وسط الكلمة على النبرة إذا كان ما قبلها مفتوحًا."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القاضي",
-                option2: "القاضي",
-                correctIndex: 0,
-                rule: "الهمزة على الياء إذا كان ما قبلها مفتوحًا."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "القُضاه",
-                option2: "القُضاة",
-                correctIndex: 1,
-                rule: "تُكتب التاء المربوطة في نهاية الكلمة إذا كانت مؤنثة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "البُنّ",
-                option2: "البُن",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "القُرآن",
-                option2: "القُرَان",
-                correctIndex: 0,
-                rule: "تُكتب الألف المقصورة في وسط الكلمة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "الشمس",
-                option2: "الشَمس",
-                correctIndex: 0,
-                rule: "لا تُكتب همزة القطع في منتصف الكلمة إذا لم يكن هناك سبب قواعد."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسافِرون",
-                option2: "المُسافِرُون",
-                correctIndex: 0,
-                rule: "لا تُكتب الألف في آخر الكلمة إذا كانت تاء مفتوحة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَكتُب",
-                option2: "يَكْتُب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُدَرِّس",
-                option2: "المُدَرِس",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القِراءة",
-                option2: "القِراة",
-                correctIndex: 0,
-                rule: "تُكتب الألف في وسط الكلمة إذا كان السبب قواعد."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَفَكِّر",
-                option2: "المُتَفَكِر",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَذهَب",
-                option2: "يَذْهَب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسافِر",
-                option2: "المُسافِرُ",
-                correctIndex: 0,
-                rule: "لا تُكتب الألف في آخر الكلمة إذا كانت تاء مفتوحة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القُرآن",
-                option2: "القُرَان",
-                correctIndex: 0,
-                rule: "تُكتب الألف المقصورة في وسط الكلمة."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُعَلِّم",
-                option2: "المُعَلِم",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَفعَل",
-                option2: "يَفْعَل",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَحَدِّث",
-                option2: "المُتَحَدِث",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القَلَم",
-                option2: "القَلَم",
-                correctIndex: 0,
-                rule: "الهمزة على الألف إذا كان ما قبلها مفتوحًا."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسَافِر",
-                option2: "المُسافِر",
-                correctIndex: 0,
-                rule: "لا توجد فروق."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَكتُب",
-                option2: "يَكْتُب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَفَكِّر",
-                option2: "المُتَفَكِر",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَذهَب",
-                option2: "يَذْهَب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسافِر",
-                option2: "المُسافِرُ",
-                correctIndex: 0,
-                rule: "لا تُكتب الألف في آخر الكلمة إذا كانت تاء مفتوحة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القُرآن",
-                option2: "القُرَان",
-                correctIndex: 0,
-                rule: "تُكتب الألف المقصورة في وسط الكلمة."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُعَلِّم",
-                option2: "المُعَلِم",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَفعَل",
-                option2: "يَفْعَل",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَحَدِّث",
-                option2: "المُتَحَدِث",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القَلَم",
-                option2: "القَلَم",
-                correctIndex: 0,
-                rule: "الهمزة على الألف إذا كان ما قبلها مفتوحًا."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسَافِر",
-                option2: "المُسافِر",
-                correctIndex: 0,
-                rule: "لا توجد فروق."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَكتُب",
-                option2: "يَكْتُب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَفَكِّر",
-                option2: "المُتَفَكِر",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَذهَب",
-                option2: "يَذْهَب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسافِر",
-                option2: "المُسافِرُ",
-                correctIndex: 0,
-                rule: "لا تُكتب الألف في آخر الكلمة إذا كانت تاء مفتوحة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القُرآن",
-                option2: "القُرَان",
-                correctIndex: 0,
-                rule: "تُكتب الألف المقصورة في وسط الكلمة."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُعَلِّم",
-                option2: "المُعَلِم",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَفعَل",
-                option2: "يَفْعَل",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَحَدِّث",
-                option2: "المُتَحَدِث",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القَلَم",
-                option2: "القَلَم",
-                correctIndex: 0,
-                rule: "الهمزة على الألف إذا كان ما قبلها مفتوحًا."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسَافِر",
-                option2: "المُسافِر",
-                correctIndex: 0,
-                rule: "لا توجد فروق."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَكتُب",
-                option2: "يَكْتُب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَفَكِّر",
-                option2: "المُتَفَكِر",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَذهَب",
-                option2: "يَذْهَب",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُسافِر",
-                option2: "المُسافِرُ",
-                correctIndex: 0,
-                rule: "لا تُكتب الألف في آخر الكلمة إذا كانت تاء مفتوحة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "القُرآن",
-                option2: "القُرَان",
-                correctIndex: 0,
-                rule: "تُكتب الألف المقصورة في وسط الكلمة."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُعَلِّم",
-                option2: "المُعَلِم",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            },
-            {
-                question: "أي من الكلمتين التالية صحيحة؟",
-                option1: "يَفعَل",
-                option2: "يَفْعَل",
-                correctIndex: 0,
-                rule: "لا يُشترط كتابة سكون على الفاء إذا لم يتبعها حرف متحرك."
-            },
-            {
-                question: "ما هو الشكل الصحيح؟",
-                option1: "المُتَحَدِّث",
-                option2: "المُتَحَدِث",
-                correctIndex: 0,
-                rule: "تُشدّد الحروف إذا كانت متتابعة."
-            }
+            { q: "اختر الكلمة الصحيحة:", options: ["الذين", "اللذين"], correct: 0 },
+            { q: "اختر الإملاء الصحيح:", options: ["شاطئ", "شاطء"], correct: 0 },
+            { q: "ما هي الصواب؟", options: ["مسؤولية", "مسؤلية"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["قائمة", "قائمه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["يتقدمون", "يتقدمو"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["يأكلون", "ياكلون"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الرجال", "الرجال"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["السيارة", "السياره"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الكتابة", "الكتابه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["المعلم", "المعلّم"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["القلم", "القَلَم"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الشمس", "الشمس"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["القمر", "القمر"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["السماء", "السما"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الأرض", "الارض"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["البحر", "البَحر"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["النهر", "النهر"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الجبل", "الجبُل"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الغابة", "الغابه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الوردة", "الوردّه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["النحلة", "النحله"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الطائر", "الطير"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الأسد", "الاسد"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الفيل", "الفيل"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["النمر", "النمر"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الجمل", "الجمّل"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["البقرة", "البقره"], correct: 0 },
+            { q: "أيhem أصح؟", options: ["الخروف", "الخروف"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الدجاجة", "الدجاجه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["السمكة", "السمكه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["التفاح", "التفاح"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الموز", "الموز"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["البرتقال", "البرتقال"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الكرز", "الكرز"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الخوخ", "الخوخ"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الرمان", "الرُمّان"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["العنب", "العنب"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الليمون", "الليمو"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الخضار", "الخضروات"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الطماطم", "البندورة"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["البصل", "البصل"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الثوم", "الثوم"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["البطاطا", "البطاطس"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الجزر", "الجزر"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["الملفوف", "الكرنب"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["السبانخ", "ال-spinach"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["البنك", "البنك"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["المدرسة", "المدرسه"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["المستشفى", "المستشفي"], correct: 0 },
+            { q: "أيهم أصح؟", options: ["المحطة", "المحطه"], correct: 0 }
         ];
 
-        // Duplicate questions to reach 500 total
-        const allQuestions = [];
-        for (let i = 0; i < 10; i++) {
-            allQuestions.push(...questions.map(q => ({ ...q })));
-        }
+        // DOM elements
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const resultMessageEl = document.getElementById('result-message');
+        const questionCounterEl = document.getElementById('question-counter');
+        const scoreEl = document.getElementById('score');
+        const currentScoreEl = document.getElementById('current-score');
+        const progressBarEl = document.getElementById('progress-bar');
+        const restartBtnEl = document.getElementById('restart-btn');
 
-        // Shuffle questions
-        for (let i = allQuestions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
-        }
-
-        // State variables
+        // Game state
         let currentQuestionIndex = 0;
         let score = 0;
         let answered = false;
 
-        // DOM elements
-        const questionText = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const explanation = document.getElementById('explanation');
-        const ruleText = document.getElementById('ruleText');
-        const nextBtn = document.getElementById('nextBtn');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const progressFill = document.getElementById('progressFill');
-        const exportBtn = document.getElementById('exportBtn');
-        const ratioSelector = document.getElementById('ratioSelector');
-        const quizCard = document.getElementById('quizCard');
-
-        // Initialize quiz
-        function initQuiz() {
-            // Load saved state from localStorage
-            const savedState = JSON.parse(localStorage.getItem('quizState'));
-            if (savedState) {
-                currentQuestionIndex = savedState.currentQuestionIndex;
-                score = savedState.score;
-            }
-            
-            showQuestion();
-            updateProgress();
+        // Initialize the game
+        function initGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = false;
+            updateUI();
+            renderQuestion();
         }
 
-        // Show current question
-        function showQuestion() {
-            const q = allQuestions[currentQuestionIndex];
-            questionText.textContent = q.question;
+        // Render current question
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionTextEl.textContent = question.q;
             
-            optionsContainer.innerHTML = '';
-            q.option1 = q.option1.trim();
-            q.option2 = q.option2.trim();
+            optionsContainerEl.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.innerHTML = `
+                    <span>${option}</span>
+                    <span class="icon">${index === question.correct ? '✓' : '✗'}</span>
+                `;
+                
+                button.addEventListener('click', () => handleAnswerClick(index, question.correct));
+                optionsContainerEl.appendChild(button);
+            });
             
-            const option1Btn = document.createElement('button');
-            option1Btn.className = 'option-btn';
-            option1Btn.textContent = q.option1;
-            option1Btn.dataset.index = 0;
-            option1Btn.addEventListener('click', () => handleAnswer(0));
-            optionsContainer.appendChild(option1Btn);
-            
-            const option2Btn = document.createElement('button');
-            option2Btn.className = 'option-btn';
-            option2Btn.textContent = q.option2;
-            option2Btn.dataset.index = 1;
-            option2Btn.addEventListener('click', () => handleAnswer(1));
-            optionsContainer.appendChild(option2Btn);
-            
-            explanation.classList.remove('show');
-            nextBtn.disabled = true;
+            resultMessageEl.textContent = '';
             answered = false;
         }
 
-        // Handle answer selection
-        function handleAnswer(selectedIndex) {
+        // Handle answer click
+        function handleAnswerClick(selectedIndex, correctIndex) {
             if (answered) return;
-            
-            const q = allQuestions[currentQuestionIndex];
-            const options = optionsContainer.querySelectorAll('.option-btn');
-            
-            // Disable all buttons
-            options.forEach(btn => btn.disabled = true);
-            
-            // Highlight correct answer
-            options[q.correctIndex].classList.add('correct');
-            
-            // Highlight incorrect answer if wrong
-            if (selectedIndex !== q.correctIndex) {
-                options[selectedIndex].classList.add('incorrect');
-            } else {
-                score++;
-            }
-            
-            // Show explanation
-            ruleText.textContent = q.rule;
-            explanation.classList.add('show');
-            
-            // Enable next button
-            nextBtn.disabled = false;
             answered = true;
             
-            // Update score display
-            updateProgress();
+            const buttons = optionsContainerEl.querySelectorAll('.option-btn');
             
-            // Save state to localStorage
-            saveState();
-        }
-
-        // Move to next question
-        function nextQuestion() {
-            currentQuestionIndex++;
+            // Disable all buttons after selection
+            buttons.forEach(btn => btn.disabled = true);
             
-            if (currentQuestionIndex >= allQuestions.length) {
-                // End of quiz
-                questionText.textContent = "انتهى الاختبار! أحسنت.";
-                optionsContainer.innerHTML = '';
-                explanation.classList.remove('show');
-                nextBtn.disabled = true;
+            // Highlight selected answer
+            if (selectedIndex === correctIndex) {
+                buttons[selectedIndex].classList.add('correct');
+                resultMessageEl.innerHTML = `✓ إجابة صحيحة!`;
+                score++;
             } else {
-                showQuestion();
+                buttons[selectedIndex].classList.add('incorrect');
+                buttons[correctIndex].classList.add('correct');
+                resultMessageEl.innerHTML = `✗ إجابة خاطئة! الإجابة الصحيحة: ${questions[currentQuestionIndex].options[correctIndex]}`;
             }
             
-            // Save state to localStorage
-            saveState();
+            // Update score and progress after a delay
+            setTimeout(() => {
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex < questions.length) {
+                    setTimeout(renderQuestion, 1500);
+                } else {
+                    showResults();
+                }
+                updateUI();
+            }, 1500);
         }
 
-        // Update progress bar and score
-        function updateProgress() {
-            const progress = ((currentQuestionIndex + 1) / allQuestions.length) * 100;
-            progressFill.style.width = `${progress}%`;
-            scoreDisplay.textContent = `النتيجة: ${score}/${allQuestions.length}`;
-        }
-
-        // Save state to localStorage
-        function saveState() {
-            const state = {
-                currentQuestionIndex,
-                score
-            };
-            localStorage.setItem('quizState', JSON.stringify(state));
-        }
-
-        // Export screenshot
-        async function exportScreenshot() {
-            const ratio = ratioSelector.value;
-            let width, height;
+        // Show final results
+        function showResults() {
+            questionTextEl.textContent = `اكتملت اللعبة!`;
+            optionsContainerEl.innerHTML = '';
+            resultMessageEl.innerHTML = `<strong>النتيجة النهائية: ${score} من ${questions.length}</strong>`;
             
-            switch(ratio) {
-                case '9x16':
-                    width = 1080;
-                    height = 1920;
-                    break;
-                case '1x1':
-                    width = 1080;
-                    height = 1080;
-                    break;
-                case '4x5':
-                    width = 1080;
-                    height = 1350;
-                    break;
-                default:
-                    width = 1080;
-                    height = 1080;
+            if (score === questions.length) {
+                resultMessageEl.innerHTML += `<br>ممتاز! أجبت على جميع الأسئلة بشكل صحيح.`;
+            } else if (score >= questions.length * 0.7) {
+                resultMessageEl.innerHTML += `<br>أداء جيد جداً!`;
+            } else if (score >= questions.length * 0.5) {
+                resultMessageEl.innerHTML += `<br>أداء مقبول، يمكنك التحسن!`;
+            } else {
+                resultMessageEl.innerHTML += `<br>تحتاج للمزيد من التدريب.`;
             }
             
-            // Temporarily change card size for export
-            quizCard.style.width = `${width/4}px`;
-            quizCard.style.height = `${height/4}px`;
-            
-            const canvas = await html2canvas(document.querySelector('.quiz-card'), {
-                scale: 4,
-                useCORS: true,
-                backgroundColor: null
-            });
-            
-            // Restore original size
-            quizCard.style.width = '';
-            quizCard.style.height = '';
-            
-            // Create download link
-            const link = document.createElement('a');
-            link.download = `quiz-result-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            restartBtnEl.style.display = 'block';
         }
 
-        // Event listeners
-        nextBtn.addEventListener('click', nextQuestion);
-        exportBtn.addEventListener('click', exportScreenshot);
+        // Update UI elements
+        function updateUI() {
+            questionCounterEl.textContent = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+            scoreEl.textContent = `النتيجة: ${score}`;
+            currentScoreEl.textContent = `النتيجة الحالية: ${score} / ${currentQuestionIndex}`;
+            
+            const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+            progressBarEl.style.width = `${progressPercent}%`;
+        }
 
-        // Initialize the quiz when page loads
-        window.onload = initQuiz;
+        // Event listener for restart button
+        restartBtnEl.addEventListener('click', initGame);
+
+        // Start the game
+        initGame();
     </script>
 </body>
 </html>
-
