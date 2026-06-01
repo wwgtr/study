@@ -149,6 +149,7 @@
             justify-content: center;
             gap: 15px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .animation-controls button {
@@ -183,6 +184,7 @@
         .layer-controls {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .layer-controls button {
@@ -264,6 +266,7 @@
             font-size: 0.9rem;
         }
 
+        /* تنسيقات الاستجابة */
         @media (max-width: 768px) {
             .controls-grid {
                 grid-template-columns: 1fr;
@@ -273,8 +276,42 @@
                 flex-direction: column;
             }
             
+            .animation-controls button, .btn-row button {
+                width: 100%;
+            }
+            
             h1 {
                 font-size: 2rem;
+            }
+            
+            .preview-container, .individual-preview {
+                height: 300px;
+            }
+            
+            .social-icons {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .glass-card {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .preview-container, .individual-preview {
+                height: 250px;
+            }
+            
+            .layer-controls {
+                flex-direction: column;
             }
         }
     </style>
@@ -289,8 +326,8 @@
         <main>
             <div class="glass-card">
                 <div class="control-group">
-                    <label for="json-upload">رفع ملف JSON:</label>
-                    <input type="file" id="json-upload" accept=".json">
+                    <label for="json-upload">رفع ملفات JSON (يمكنك تحديد أكثر من ملف):</label>
+                    <input type="file" id="json-upload" accept=".json" multiple>
                 </div>
 
                 <div class="controls-grid">
@@ -559,8 +596,11 @@
             }
             
             function handleFileUpload(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                
+                // استخدام أول ملف فقط
+                const file = files[0];
                 
                 // تصفية الملف القديم
                 if (anim) {
