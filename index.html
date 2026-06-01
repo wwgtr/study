@@ -210,30 +210,6 @@
             height: 100%;
         }
 
-        .color-picker-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .color-slider {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .color-slider input[type="range"] {
-            flex: 1;
-        }
-
-        .color-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
         .social-icons {
             display: flex;
             justify-content: center;
@@ -386,31 +362,6 @@
                 <div class="individual-preview">
                     <div id="individual-layer-container"></div>
                 </div>
-                
-                <div class="color-picker-container">
-                    <h3>محرر الألوان المتقدم:</h3>
-                    <div class="color-slider">
-                        <label for="red-slider">الأحمر:</label>
-                        <input type="range" id="red-slider" min="0" max="255" value="255">
-                        <div class="color-preview" id="red-preview" style="background-color: rgb(255, 0, 0);"></div>
-                    </div>
-                    <div class="color-slider">
-                        <label for="green-slider">الأخضر:</label>
-                        <input type="range" id="green-slider" min="0" max="255" value="255">
-                        <div class="color-preview" id="green-preview" style="background-color: rgb(0, 255, 0);"></div>
-                    </div>
-                    <div class="color-slider">
-                        <label for="blue-slider">الأزرق:</label>
-                        <input type="range" id="blue-slider" min="0" max="255" value="255">
-                        <div class="color-preview" id="blue-preview" style="background-color: rgb(0, 0, 255);"></div>
-                    </div>
-                    <div class="color-slider">
-                        <label for="alpha-slider">الشفافية:</label>
-                        <input type="range" id="alpha-slider" min="0" max="100" value="100">
-                        <div class="color-preview" id="alpha-preview" style="background-color: rgba(255, 255, 255, 1);"></div>
-                    </div>
-                    <button id="apply-color-btn">تطبيق اللون</button>
-                </div>
             </div>
         </main>
 
@@ -461,17 +412,6 @@
             const selectAllBtn = document.getElementById('select-all-btn');
             const layersList = document.getElementById('layers-list');
             
-            // عناصر محرر الألوان
-            const redSlider = document.getElementById('red-slider');
-            const greenSlider = document.getElementById('green-slider');
-            const blueSlider = document.getElementById('blue-slider');
-            const alphaSlider = document.getElementById('alpha-slider');
-            const redPreview = document.getElementById('red-preview');
-            const greenPreview = document.getElementById('green-preview');
-            const bluePreview = document.getElementById('blue-preview');
-            const alphaPreview = document.getElementById('alpha-preview');
-            const applyColorBtn = document.getElementById('apply-color-btn');
-            
             let anim = null;
             let animIndividual = null;
             let currentAnimationData = null;
@@ -507,50 +447,6 @@
             
             playSelectedBtn.addEventListener('click', playSelectedLayers);
             selectAllBtn.addEventListener('click', toggleSelectAll);
-            
-            // أحداث محرر الألوان
-            redSlider.addEventListener('input', updateColorPreview);
-            greenSlider.addEventListener('input', updateColorPreview);
-            blueSlider.addEventListener('input', updateColorPreview);
-            alphaSlider.addEventListener('input', updateColorPreview);
-            applyColorBtn.addEventListener('click', applyColorToSelected);
-            
-            function updateColorPreview() {
-                const r = redSlider.value;
-                const g = greenSlider.value;
-                const b = blueSlider.value;
-                const a = alphaSlider.value / 100;
-                
-                redPreview.style.backgroundColor = `rgb(${r}, 0, 0)`;
-                greenPreview.style.backgroundColor = `rgb(0, ${g}, 0)`;
-                bluePreview.style.backgroundColor = `rgb(0, 0, ${b})`;
-                alphaPreview.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${a})`;
-            }
-            
-            function applyColorToSelected() {
-                if (selectedLayers.size === 0) {
-                    alert('يرجى تحديد طبقة واحدة على الأقل');
-                    return;
-                }
-                
-                const r = redSlider.value;
-                const g = greenSlider.value;
-                const b = blueSlider.value;
-                const a = alphaSlider.value / 100;
-                
-                // في Lottie، لا توجد طريقة مباشرة لتعديل الألوان بعد التحميل
-                // نحتاج إلى تعديل البيانات الأصلية
-                if (currentAnimationData && currentAnimationData.layers) {
-                    for (const layerId of selectedLayers) {
-                        const layer = layers.find(l => l.id === layerId);
-                        if (layer) {
-                            // في هذا المثال البسيط، لا نقوم بتعديل الألوان فعليًا
-                            // لأن Lottie لا يدعم ذلك بسهولة
-                            alert(`تم تعيين اللون RGB(${r},${g},${b}) مع شفافية ${a} للطبقة ${layer.name}`);
-                        }
-                    }
-                }
-            }
             
             function playSelectedLayers() {
                 if (selectedLayers.size === 0) {
@@ -1052,9 +948,6 @@
                     console.error('لا يمكن استخراج عنصر SVG');
                 }
             }
-            
-            // تهيئة عرض الألوان عند تحميل الصفحة
-            updateColorPreview();
         });
     </script>
 </body>
