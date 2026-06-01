@@ -144,6 +144,49 @@
             min-width: 150px;
         }
 
+        .animation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .animation-controls button {
+            min-width: auto;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+        }
+
+        .layers-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .layer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .layer-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .layer-controls button {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            min-width: auto;
+        }
+
         footer {
             text-align: center;
             margin-top: 30px;
@@ -157,7 +200,7 @@
                 grid-template-columns: 1fr;
             }
             
-            .btn-row {
+            .btn-row, .animation-controls {
                 flex-direction: column;
             }
             
@@ -215,6 +258,20 @@
                 <div class="preview-container">
                     <div id="animation-container"></div>
                 </div>
+                
+                <div class="animation-controls">
+                    <button id="play-btn">تشغيل</button>
+                    <button id="pause-btn">إيقاف مؤقت</button>
+                    <button id="stop-btn">إيقاف</button>
+                    <button id="loop-toggle">تكرار: فعال</button>
+                </div>
+                
+                <div class="layers-panel">
+                    <h3>الطبقات:</h3>
+                    <div id="layers-list">
+                        <!-- سيتم ملء الطبقات هنا -->
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -233,8 +290,19 @@
             const convertSvgBtn = document.getElementById('convert-svg-btn');
             const animationContainer = document.getElementById('animation-container');
             
+            // عناصر التحكم في الرسوم المتحركة
+            const playBtn = document.getElementById('play-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const loopToggle = document.getElementById('loop-toggle');
+            
+            // لوحة الطبقات
+            const layersList = document.getElementById('layers-list');
+            
             let anim = null;
             let currentAnimationData = null;
+            let isLooping = true;
+            let layers = [];
             
             jsonUpload.addEventListener('change', handleFileUpload);
             speedControl.addEventListener('input', updateAnimationSpeed);
@@ -242,6 +310,24 @@
             colorFilter.addEventListener('change', updateColorFilter);
             exportJsonBtn.addEventListener('click', exportModifiedJson);
             convertSvgBtn.addEventListener('click', convertToSvg);
+            
+            // أحداث عناصر التحكم في الرسوم المتحركة
+            playBtn.addEventListener('click', () => {
+                if (anim) anim.play();
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                if (anim) anim.pause();
+            });
+            
+            stopBtn.addEventListener('click', () => {
+                if (anim) {
+                    anim.stop();
+                    anim.goToAndStop(0, true);
+                }
+            });
+            
+            loopToggle.addEventListener('click', toggleLoop);
             
             function handleFileUpload(e) {
                 const file = e.target.files[0];
@@ -252,12 +338,78 @@
                     try {
                         const jsonData = JSON.parse(event.target.result);
                         currentAnimationData = jsonData;
+                        
+                        // استخراج الطبقات من البيانات
+                        extractLayers(jsonData);
+                        
                         loadLottieAnimation(jsonData);
                     } catch (error) {
                         alert('خطأ في قراءة الملف JSON');
                     }
                 };
                 reader.readAsText(file);
+            }
+            
+            function extractLayers(data) {
+                layers = [];
+                
+                if (data.layers) {
+                    data.layers.forEach((layer, index) => {
+                        layers.push({
+                            id: index,
+                            name: layer.nm || `الطبقة ${index + 1}`,
+                            visible: layer.hd !== true,
+                            type: layer.ty || 0,
+                            originalIndex: index
+                        });
+                    });
+                }
+                
+                renderLayersList();
+            }
+            
+            function renderLayersList() {
+                layersList.innerHTML = '';
+                
+                layers.forEach(layer => {
+                    const layerItem = document.createElement('div');
+                    layerItem.className = 'layer-item';
+                    
+                    layerItem.innerHTML = `
+                        <span>${layer.name}</span>
+                        <div class="layer-controls">
+                            <button class="toggle-layer" data-id="${layer.id}">${layer.visible ? 'إخفاء' : 'إظهار'}</button>
+                        </div>
+                    `;
+                    
+                    layersList.appendChild(layerItem);
+                });
+                
+                // إضافة أحداث الزر لتبديل الرؤية
+                document.querySelectorAll('.toggle-layer').forEach(button => {
+                    button.addEventListener('click', toggleLayerVisibility);
+                });
+            }
+            
+            function toggleLayerVisibility(e) {
+                const layerId = parseInt(e.target.getAttribute('data-id'));
+                const layer = layers.find(l => l.id === layerId);
+                
+                if (layer) {
+                    layer.visible = !layer.visible;
+                    
+                    // تحديث النص على الزر
+                    e.target.textContent = layer.visible ? 'إخفاء' : 'إظهار';
+                    
+                    // في Lottie، لا توجد طريقة مباشرة لتمكين/تعطيل الطبقات
+                    // نعيد تحميل الرسوم المتحركة مع تعديل البيانات إذا كانت متاحة
+                    if (currentAnimationData && currentAnimationData.layers) {
+                        currentAnimationData.layers[layer.originalIndex].hd = !layer.visible;
+                        
+                        // إعادة تحميل الرسوم المتحركة
+                        loadLottieAnimation(currentAnimationData);
+                    }
+                }
             }
             
             function loadLottieAnimation(data) {
@@ -268,7 +420,7 @@
                 anim = lottie.loadAnimation({
                     container: animationContainer,
                     renderer: 'svg',
-                    loop: true,
+                    loop: isLooping,
                     autoplay: true,
                     animationData: data
                 });
@@ -298,6 +450,14 @@
                 };
                 
                 animationContainer.style.filter = filterMap[filterValue] || 'none';
+            }
+            
+            function toggleLoop() {
+                isLooping = !isLooping;
+                if (anim) {
+                    anim.loop = isLooping;
+                }
+                loopToggle.textContent = isLooping ? 'تكرار: فعال' : 'تكرار: غير فعال';
             }
             
             function exportModifiedJson() {
