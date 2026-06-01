@@ -401,6 +401,25 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 
+                // تصفية الملف القديم
+                if (anim) {
+                    anim.destroy();
+                    anim = null;
+                }
+                
+                if (animIndividual) {
+                    animIndividual.destroy();
+                    animIndividual = null;
+                }
+                
+                currentAnimationData = null;
+                layers = [];
+                selectedLayer = null;
+                
+                // مسح واجهة المستخدم
+                layersList.innerHTML = '';
+                individualLayerContainer.innerHTML = '';
+                
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
@@ -552,7 +571,6 @@
                         layers: [currentAnimationData.layers[layer.originalIndex]]
                     };
                     
-                    // تحميل الرسوم المتحركة الفردي
                     if (animIndividual) {
                         animIndividual.destroy();
                     }
@@ -574,18 +592,14 @@
                 const layerIndex = layers.findIndex(l => l.id === layerId);
                 
                 if (layerIndex !== -1) {
-                    // حذف من المصفوفة المحلية
                     layers.splice(layerIndex, 1);
                     
-                    // حذف من البيانات الأصلية
                     if (currentAnimationData && currentAnimationData.layers) {
                         currentAnimationData.layers.splice(layer.originalIndex, 1);
                         
-                        // إعادة تحميل الرسوم المتحركة
                         loadLottieAnimation(currentAnimationData);
                     }
                     
-                    // تحديث واجهة المستخدم
                     renderLayersList();
                 }
             }
@@ -594,14 +608,12 @@
                 const layerId = parseInt(e.target.getAttribute('data-id'));
                 selectedLayer = layers.find(l => l.id === layerId);
                 
-                // تحديث واجهة المستخدم
                 document.querySelectorAll('.layer-item').forEach(item => {
                     item.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
                 });
                 
                 e.target.closest('.layer-item').style.backgroundColor = 'rgba(255, 126, 95, 0.3)';
                 
-                // بدء التحريك إذا تم اختيار الطبقة
                 if (selectedLayer) {
                     enableLayerDragging();
                 }
@@ -638,7 +650,6 @@
                     startX = e.clientX;
                     startY = e.clientY;
                     
-                    // تطبيق التحريك على العنصر في SVG
                     applyLayerTransform(selectedLayer);
                 }
                 
@@ -648,18 +659,13 @@
             }
             
             function applyLayerTransform(layer) {
-                // في Lottie، لا توجد طريقة مباشرة لتعديل موقع الطبقة بعد التحميل
-                // نحتاج إلى تعديل بيانات الطبقة ثم إعادة التحميل
                 if (currentAnimationData && currentAnimationData.layers && currentAnimationData.layers[layer.originalIndex]) {
-                    // إنشاء تحويل للطبقة ( Translation )
                     const layerData = currentAnimationData.layers[layer.originalIndex];
                     
-                    // التحقق من وجود مصفوفة التحويل
                     if (!layerData.ks) layerData.ks = {};
                     if (!layerData.ks.a) layerData.ks.a = { a: 0, k: [0, 0, 0] }; // Anchor Point
                     if (!layerData.ks.p) layerData.ks.p = { a: 0, k: [0, 0, 0] }; // Position
                     
-                    // تعديل الموضع
                     if (Array.isArray(layerData.ks.p.k)) {
                         layerData.ks.p.k[0] = layer.x;
                         layerData.ks.p.k[1] = layer.y;
@@ -667,7 +673,6 @@
                         layerData.ks.p.k = [layer.x, layer.y, 0];
                     }
                     
-                    // إعادة تحميل الرسوم المتحركة
                     loadLottieAnimation(currentAnimationData);
                 }
             }
@@ -679,15 +684,11 @@
                 if (layer) {
                     layer.visible = !layer.visible;
                     
-                    // تحديث النص على الزر
                     e.target.textContent = layer.visible ? 'إخفاء' : 'إظهار';
                     
-                    // في Lottie، لا توجد طريقة مباشرة لتمكين/تعطيل الطبقات
-                    // نعيد تحميل الرسوم المتحركة مع تعديل البيانات إذا كانت متاحة
                     if (currentAnimationData && currentAnimationData.layers) {
                         currentAnimationData.layers[layer.originalIndex].hd = !layer.visible;
                         
-                        // إعادة تحميل الرسوم المتحركة
                         loadLottieAnimation(currentAnimationData);
                     }
                 }
@@ -768,11 +769,8 @@
                     return;
                 }
                 
-                // في الواقع، تحويل JSON Lottie إلى SVG يتطلب معالجة معقدة
-                // هذا كود تجريبي لعرض رسالة
                 alert('تم تحويل الرسوم المتحركة إلى SVG (الوظيفة الكاملة تحتاج إلى تنفيذ إضافي)');
                 
-                // كود تجريبي لجلب SVG من العارض
                 const svgElement = animationContainer.querySelector('svg');
                 if (svgElement) {
                     const serializer = new XMLSerializer();
