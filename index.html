@@ -210,6 +210,38 @@
             height: 100%;
         }
 
+        .svg-editor-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .svg-editor-container.active {
+            display: block;
+        }
+
+        .svg-canvas {
+            width: 100%;
+            height: 300px;
+            background: white;
+            border-radius: 8px;
+            overflow: auto;
+        }
+
+        .svg-tools {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .svg-tools button {
+            flex: 1;
+            min-width: 100px;
+        }
+
         .social-icons {
             display: flex;
             justify-content: center;
@@ -362,6 +394,21 @@
                 <div class="individual-preview">
                     <div id="individual-layer-container"></div>
                 </div>
+                
+                <div class="svg-editor-container">
+                    <h3>محرر SVG:</h3>
+                    <div class="svg-canvas" id="svg-canvas">
+                        <svg width="100%" height="100%" id="editable-svg"></svg>
+                    </div>
+                    <div class="svg-tools">
+                        <button id="add-circle-btn">إضافة دائرة</button>
+                        <button id="add-rect-btn">إضافة مستطيل</button>
+                        <button id="add-line-btn">إضافة خط</button>
+                        <button id="add-text-btn">إضافة نص</button>
+                        <button id="change-color-btn">تغيير اللون</button>
+                        <button id="delete-element-btn">حذف العنصر</button>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -412,6 +459,16 @@
             const selectAllBtn = document.getElementById('select-all-btn');
             const layersList = document.getElementById('layers-list');
             
+            // عناصر محرر SVG
+            const svgEditorContainer = document.querySelector('.svg-editor-container');
+            const editableSvg = document.getElementById('editable-svg');
+            const addCircleBtn = document.getElementById('add-circle-btn');
+            const addRectBtn = document.getElementById('add-rect-btn');
+            const addLineBtn = document.getElementById('add-line-btn');
+            const addTextBtn = document.getElementById('add-text-btn');
+            const changeColorBtn = document.getElementById('change-color-btn');
+            const deleteElementBtn = document.getElementById('delete-element-btn');
+            
             let anim = null;
             let animIndividual = null;
             let currentAnimationData = null;
@@ -419,6 +476,7 @@
             let layers = [];
             let selectedLayer = null;
             let selectedLayers = new Set(); // لتخزين الطبقات المحددة
+            let selectedSvgElement = null; // لتخزين العنصر المحدد في محرر SVG
             
             jsonUpload.addEventListener('change', handleFileUpload);
             speedControl.addEventListener('input', updateAnimationSpeed);
@@ -447,6 +505,28 @@
             
             playSelectedBtn.addEventListener('click', playSelectedLayers);
             selectAllBtn.addEventListener('click', toggleSelectAll);
+            
+            // أحداث محرر SVG
+            addCircleBtn.addEventListener('click', addCircle);
+            addRectBtn.addEventListener('click', addRectangle);
+            addLineBtn.addEventListener('click', addLine);
+            addTextBtn.addEventListener('click', addText);
+            changeColorBtn.addEventListener('click', changeColor);
+            deleteElementBtn.addEventListener('click', deleteElement);
+            
+            // عند النقر على عنصر SVG لتحديده
+            editableSvg.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'svg') {
+                    selectedSvgElement = e.target;
+                    
+                    // إزالة التحديد من العناصر الأخرى
+                    const allElements = editableSvg.querySelectorAll('*');
+                    allElements.forEach(el => el.style.outline = 'none');
+                    
+                    // إضافة تحديد للعنصر المختار
+                    selectedSvgElement.style.outline = '2px solid #ff7e5f';
+                }
+            });
             
             function playSelectedLayers() {
                 if (selectedLayers.size === 0) {
@@ -946,6 +1026,82 @@
                     }, 0);
                 } else {
                     console.error('لا يمكن استخراج عنصر SVG');
+                }
+                
+                // عرض محرر SVG
+                svgEditorContainer.classList.add('active');
+            }
+            
+            // وظائف محرر SVG
+            function addCircle() {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", Math.random() * 200 + 50);
+                circle.setAttribute("cy", Math.random() * 100 + 50);
+                circle.setAttribute("r", 30);
+                circle.setAttribute("fill", "#ff7e5f");
+                circle.setAttribute("stroke", "#feb47b");
+                circle.setAttribute("stroke-width", "2");
+                editableSvg.appendChild(circle);
+            }
+            
+            function addRectangle() {
+                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rect.setAttribute("x", Math.random() * 200 + 50);
+                rect.setAttribute("y", Math.random() * 100 + 50);
+                rect.setAttribute("width", 80);
+                rect.setAttribute("height", 60);
+                rect.setAttribute("fill", "#feb47b");
+                rect.setAttribute("stroke", "#ff7e5f");
+                rect.setAttribute("stroke-width", "2");
+                rect.setAttribute("rx", "10");
+                editableSvg.appendChild(rect);
+            }
+            
+            function addLine() {
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", Math.random() * 200 + 50);
+                line.setAttribute("y1", Math.random() * 100 + 50);
+                line.setAttribute("x2", Math.random() * 200 + 100);
+                line.setAttribute("y2", Math.random() * 100 + 100);
+                line.setAttribute("stroke", "#ff7e5f");
+                line.setAttribute("stroke-width", "3");
+                editableSvg.appendChild(line);
+            }
+            
+            function addText() {
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", Math.random() * 200 + 50);
+                text.setAttribute("y", Math.random() * 100 + 50);
+                text.setAttribute("font-family", "Tajawal");
+                text.setAttribute("font-size", "20");
+                text.setAttribute("fill", "#e6e6e6");
+                text.textContent = "نص تجريبي";
+                editableSvg.appendChild(text);
+            }
+            
+            function changeColor() {
+                if (selectedSvgElement) {
+                    const colors = ['#ff7e5f', '#feb47b', '#4a9eff', '#5de0a5', '#d45dff'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    if (selectedSvgElement.tagName === 'text') {
+                        selectedSvgElement.setAttribute('fill', randomColor);
+                    } else {
+                        selectedSvgElement.setAttribute('fill', randomColor);
+                    }
+                } else {
+                    alert('يرجى تحديد عنصر أولاً');
+                }
+            }
+            
+            function deleteElement() {
+                if (selectedSvgElement && selectedSvgElement.tagName !== 'svg') {
+                    if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+                        selectedSvgElement.remove();
+                        selectedSvgElement = null;
+                    }
+                } else {
+                    alert('يرجى تحديد عنصر أولاً');
                 }
             }
         });
