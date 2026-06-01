@@ -187,6 +187,23 @@
             min-width: auto;
         }
 
+        .individual-preview {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        #individual-layer-container {
+            width: 100%;
+            height: 100%;
+        }
+
         .social-icons {
             display: flex;
             justify-content: center;
@@ -296,6 +313,10 @@
                         <!-- سيتم ملء الطبقات هنا -->
                     </div>
                 </div>
+                
+                <div class="individual-preview">
+                    <div id="individual-layer-container"></div>
+                </div>
             </div>
         </main>
 
@@ -333,6 +354,7 @@
             const exportJsonBtn = document.getElementById('export-json-btn');
             const convertSvgBtn = document.getElementById('convert-svg-btn');
             const animationContainer = document.getElementById('animation-container');
+            const individualLayerContainer = document.getElementById('individual-layer-container');
             
             // عناصر التحكم في الرسوم المتحركة
             const playBtn = document.getElementById('play-btn');
@@ -344,6 +366,7 @@
             const layersList = document.getElementById('layers-list');
             
             let anim = null;
+            let animIndividual = null;
             let currentAnimationData = null;
             let isLooping = true;
             let layers = [];
@@ -431,6 +454,8 @@
                         <div class="layer-controls">
                             <button class="toggle-layer" data-id="${layer.id}">${layer.visible ? 'إخفاء' : 'إظهار'}</button>
                             <button class="select-layer" data-id="${layer.id}">تحديد</button>
+                            <button class="view-individual" data-id="${layer.id}">عرض فردي</button>
+                            <button class="delete-layer" data-id="${layer.id}">حذف</button>
                         </div>
                     `;
                     
@@ -450,6 +475,16 @@
                 // إضافة أحداث الزر لإعادة التسمية
                 document.querySelectorAll('.rename-btn').forEach(button => {
                     button.addEventListener('click', showRenameInput);
+                });
+                
+                // إضافة أحداث الزر لعرض الطبقة الفردية
+                document.querySelectorAll('.view-individual').forEach(button => {
+                    button.addEventListener('click', viewIndividualLayer);
+                });
+                
+                // إضافة أحداث الزر لحذف الطبقة
+                document.querySelectorAll('.delete-layer').forEach(button => {
+                    button.addEventListener('click', deleteLayer);
                 });
                 
                 // إضافة أحداث إدخال إعادة التسمية
@@ -503,6 +538,55 @@
                     
                     nameSpan.style.display = 'inline';
                     this.style.display = 'none';
+                }
+            }
+            
+            function viewIndividualLayer(e) {
+                const layerId = parseInt(e.target.getAttribute('data-id'));
+                const layer = layers.find(l => l.id === layerId);
+                
+                if (layer && currentAnimationData && currentAnimationData.layers) {
+                    // إنشاء بيانات جديدة تحتوي فقط على الطبقة المحددة
+                    const individualLayerData = {
+                        ...currentAnimationData,
+                        layers: [currentAnimationData.layers[layer.originalIndex]]
+                    };
+                    
+                    // تحميل الرسوم المتحركة الفردي
+                    if (animIndividual) {
+                        animIndividual.destroy();
+                    }
+                    
+                    animIndividual = lottie.loadAnimation({
+                        container: individualLayerContainer,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        animationData: individualLayerData
+                    });
+                }
+            }
+            
+            function deleteLayer(e) {
+                if (!confirm('هل أنت متأكد من حذف هذه الطبقة؟')) return;
+                
+                const layerId = parseInt(e.target.getAttribute('data-id'));
+                const layerIndex = layers.findIndex(l => l.id === layerId);
+                
+                if (layerIndex !== -1) {
+                    // حذف من المصفوفة المحلية
+                    layers.splice(layerIndex, 1);
+                    
+                    // حذف من البيانات الأصلية
+                    if (currentAnimationData && currentAnimationData.layers) {
+                        currentAnimationData.layers.splice(layer.originalIndex, 1);
+                        
+                        // إعادة تحميل الرسوم المتحركة
+                        loadLottieAnimation(currentAnimationData);
+                    }
+                    
+                    // تحديث واجهة المستخدم
+                    renderLayersList();
                 }
             }
             
